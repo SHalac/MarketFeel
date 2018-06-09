@@ -2,17 +2,16 @@ package main
 
 import (
 	"fmt"
-	_ "time"
-	"net/http"
+	_ "net/http"
+	"marketfeel/secrets"
 )
 
-var (
-	url string
-)
+var consumer_key = secrets.API_KEY
+var consumer_secret = secrets.API_SECRET
 
 
 func main() {
-	var people = [...]{""}
+	fmt.Println(consumer_key)
 /*	messages := make(chan string)
 	go func() { messages <- "hello" 
 	fmt.Println("done hello!")
