@@ -2,27 +2,35 @@ package main
 
 import (
 	"fmt"
-	_ "net/http"
+	"net/http"
 	"marketfeel/secrets"
+	"net/url"
+	"strings"
+	"encoding/base64"
 )
 
-var consumer_key = secrets.API_KEY
-var consumer_secret = secrets.API_SECRET
+var (
+	consumerKey = secrets.API_KEY
+	consumerSecret = secrets.API_SECRET
+)
+
 
 
 func main() {
-	fmt.Println(consumer_key)
-/*	messages := make(chan string)
-	go func() { messages <- "hello" 
-	fmt.Println("done hello!")
-	}()
-    go func() { messages <- "ping" 
-    fmt.Println("done ping!")
-    }()
-    msg := <-messages
-    msg2 := <-messages
-    fmt.Println(msg)
-    fmt.Println(msg2)*/
-    
+	encodedToken := getBearerCred(consumerKey,consumerSecret)
+
 }
+
+/* function to obtain bearer token credentials
+input (2): consumer_key, consumer_secret
+output (1): token credential, base64 encoded
+*/
+func getBearerCred(key string, secret string) string {
+	builder := strings.Builder{}
+	builder.WriteString(url.QueryEscape(key))
+	builder.WriteString(":")
+	builder.WriteString(url.QueryEscape(secret))
+	encodedToken := base64.StdEncoding.EncodeToString([]byte(builder.String()))
+	return encodedToken
+} 
 
