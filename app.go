@@ -10,6 +10,7 @@ import (
 	"log"
 	"bytes"
 	"io/ioutil"
+	"encoding/json"
 )
 
 var (
@@ -22,6 +23,11 @@ var (
 
 func main() {
 	encodedToken := getBearerCred(consumerKey,consumerSecret)
+	
+	fmt.Println(string(respBody))
+}
+
+func bearerRequest(encodedToken){
 	body := []byte("grant_type=client_credentials")
 	req,err := http.NewRequest("POST",bearerUrl,bytes.NewBuffer(body))
 	if err != nil {
@@ -37,7 +43,13 @@ func main() {
 	}
 	defer resp.Body.Close()
 	respBody, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(respBody))
+	var jsonResp interface{} // turns into map[string]interface{}
+	err := json.Unmarshal(respBody, &f)
+	if jsonResp["token_type"].(string) == "bearer" {
+		return jsonResp["access_token"].(string)
+	} else {
+
+	}
 }
 
 /* function to obtain bearer token credentials
