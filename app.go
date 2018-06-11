@@ -25,7 +25,7 @@ var (
 
 
 func main() {
-	token, err := dbToken()
+	token, err := getDbToken()
 	if err != nil {
 		encodedToken := encodeToken(consumerKey,consumerSecret)
 		bearerToken := getBearer(encodedToken)
@@ -34,7 +34,7 @@ func main() {
 			log.Fatal("something went wrong")
 		}
 		fmt.Println("added token to db")
-		token, _ = dbToken()
+		token, _ = getDbToken()
 	}
 	fmt.Println(token)
 }
@@ -45,7 +45,7 @@ In: NONE
 out: token (string) and error, error is not nil 
 if token isn't found 
 */
-func dbToken() (s string, err error){
+func getDbToken() (s string, err error){
 	db,err := bolt.Open("token.db",0600,nil)
 	if err != nil {
 		return "error", errors.New("Could not get token from db")
@@ -122,6 +122,14 @@ func getBearer(encodedToken string) []byte {
 	} else {
 		return []byte("ERR")
 	}
+}
+
+func twitterRequest(query string) {
+	req,err := http.NewRequest("GET",query,nil)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	
 }
 
 /* function to encode credentials to be used to get bearer
