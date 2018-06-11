@@ -29,8 +29,12 @@ func main() {
 	if err != nil {
 		encodedToken := encodeToken(consumerKey,consumerSecret)
 		bearerToken := getBearer(encodedToken)
-		token = addTokenDb(bearerToken)
+		err2 := addTokenDb(bearerToken)
+		if err2 != nil {
+			log.Fatal("something went wrong")
+		}
 		fmt.Println("added token to db")
+		token, _ = dbToken()
 	}
 	fmt.Println(token)
 }
@@ -42,7 +46,7 @@ out: token (string) and error, error is not nil
 if token isn't found 
 */
 func dbToken() (s string, err error){
-	db,err := bolt.Open("token.db",0600,&bolt.Options{Timeout: 1 * time.Second})
+	db,err := bolt.Open("token.db",0600,nil)
 	if err != nil {
 		return "error", errors.New("Could not get token from db")
 	}
@@ -53,8 +57,8 @@ func dbToken() (s string, err error){
 		if bucket == nil {
 			return errors.New("can't find main bucket")
 		}
-		token = bucket.Get([]byte("token"))
-		if token == nil {
+		token = string(bucket.Get([]byte("token"))[:])
+		if token == "" {
 			return errors.New("can't find token key")
 		}
 		return nil
@@ -62,22 +66,23 @@ func dbToken() (s string, err error){
 	if err != nil {
 		return "error", errors.New("Could not get token from db")
 	}
-	return token
+	return token, nil
 
 }
 
-func addTokenDb(token string) error {
-	db,err := bolt.Open("token.db",0600,&bolt.Options{Timeout: 1 * time.Second})
+func addTokenDb(token []byte) error {
+	db,err := bolt.Open("token.db",0600,nil)
 	if err != nil {
 		return errors.New("Could not open db")
 	}
 	defer db.Close()
-	err2 = db.Update(func(tx *bolt.Tx) error {
+	err2 := db.Update(func(tx *bolt.Tx) error {
 		bucket,err := tx.CreateBucketIfNotExists(bucketName)
 		if err != nil {
 			return err
 		}
-		err = bucket.Put("token",token)
+		err = bucket.Put([]byte("token"),token)
+		return err
 		})
 	if err2 != nil {
 		return errors.New("Could not add token to DB")
@@ -90,7 +95,7 @@ Function to get bearer token from twitter
 In: encoded token for request
 Out: access token string
 */
-func getBearer(encodedToken) string{
+func getBearer(encodedToken string) []byte {
 	body := []byte("grant_type=client_credentials")
 	req,err := http.NewRequest("POST",bearerUrl,bytes.NewBuffer(body))
 	if err != nil {
@@ -107,11 +112,15 @@ func getBearer(encodedToken) string{
 	defer resp.Body.Close()
 	respBody, _ := ioutil.ReadAll(resp.Body)
 	var jsonResp interface{} // turns into map[string]interface{}
-	err := json.Unmarshal(respBody, &f)
-	if jsonResp["token_type"] == "bearer" {
-		return jsonResp["access_token"].(string)
+	err = json.Unmarshal(respBody, &jsonResp)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	jsonResp2 := jsonResp.(map[string]interface{})
+	if jsonResp2["token_type"] == "bearer" {
+		return []byte(jsonResp2["access_token"].(string))
 	} else {
-		return "ERR"
+		return []byte("ERR")
 	}
 }
 
