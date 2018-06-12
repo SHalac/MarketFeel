@@ -13,6 +13,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/boltdb/bolt"
+	"reflect"
 )
 
 var (
@@ -39,7 +40,9 @@ func main() {
 	} else {
 		fmt.Println("token already in DB ")
 	}
-	searchTweets("world cup switzerland",token)
+	var tweets []string
+	tweets = searchTweets("world cup switzerland",token)
+	fmt.Println(tweets)
 }
 
 /*
@@ -160,10 +163,10 @@ var jsonResp interface{} // turns into map[string]interface{}
 
 */
 
-func searchTweets(queries string,token string){
+func searchTweets(queries string,token string) []string {
 	type Tweets struct {
 		Statuses [] struct {
-			Text string `json:"text"`
+			Text string `json:"full_text"`
 			User struct {
 				Name string `json:"screen_name"`
 				} `json:"user"`
@@ -174,18 +177,22 @@ func searchTweets(queries string,token string){
 	builder.WriteString(tweetSearchUrl)
 	builder.WriteString("q=")
 	builder.WriteString(url.QueryEscape(queries))
+	builder.WriteString("&count=5")
+	builder.WriteString("&result_type=popular")
+	builder.WriteString("&tweet_mode=extended")
 	queryUrl := builder.String()
 	respbody := twitterRequest(queryUrl,token)
 	err := json.Unmarshal(respbody, &m)
 	if err != nil {
 		log.Fatal("wrong")
 	}
-	//fmt.Println(m)
+	var tweetSlice []string
 	for _,status := range m.Statuses {
-		fmt.Println(status.User.Name)
-		fmt.Println(status.Text)
-		fmt.Println("\n\n")
+		//fmt.Println(status.User.Name)
+		//fmt.Println(status.Text)
+		tweetSlice = append(tweetSlice,status.Text)
 	}
+	return tweetSlice
 
 }
 
