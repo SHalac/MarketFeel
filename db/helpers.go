@@ -7,6 +7,7 @@ import (
 
 var (
 	bucketName = []byte("marketFeel")
+	dbFile = "db/token.db"
 )
 
 /*
@@ -16,7 +17,7 @@ out: token (string) and error, error is not nil
 if token isn't found 
 */
 func GetDbToken() (string, error){ // the issue right now is returning byte
-	db,err := bolt.Open("token.db",0600,nil)
+	db,err := bolt.Open(dbFile,0600,nil)
 	if err != nil {
 		return "error", errors.New("Could not get token from db")
 	}
@@ -41,7 +42,7 @@ func GetDbToken() (string, error){ // the issue right now is returning byte
 }
 
 func AddTokenDb(token string) error {
-	db,err := bolt.Open("token.db",0600,nil)
+	db,err := bolt.Open(dbFile,0600,nil)
 	if err != nil {
 		return errors.New("Could not open db")
 	}

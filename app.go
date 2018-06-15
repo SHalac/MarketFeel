@@ -12,8 +12,15 @@ import (
 var (
 	consumerKey = secrets.API_KEY
 	consumerSecret = secrets.API_SECRET
-	tweetQueries = "the meaning of life -filter:retweets since:2018-05-01"
 )
+
+var searchConfig = map[string]string{
+	"lang": "en",
+	"result_type": "popular",
+	"count": "18",
+	"q": "donald trump -filter:retweets since:2018-06-01",
+	"tweet_mode": "extended",
+}
 
 
 
@@ -32,12 +39,13 @@ func main() {
 		fmt.Println("token already in DB ")
 	}
 	var tweets []string
-	tweets = utils.SearchTweets(tweetQueries,token)
+	reqUrl := utils.ParseConfig(searchConfig)
+	tweets = utils.SearchTweets(reqUrl,token)
 	fmt.Println(len(tweets), " TOTAL TWEETS FOUND for ",tweetQueries)
-	for idx, tweet := range tweets {
-		fmt.Println(idx, "===========")
+	for _, tweet := range tweets {
+		//fmt.Println(idx)
 		fmt.Println(tweet)
-		fmt.Println("\n")
+		//fmt.Println("\n")
 	}
 }
 

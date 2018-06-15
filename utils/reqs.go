@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	tweetLimit = "7"
+	tweetLimit = "26"
 	bearerUrl = "https://api.twitter.com/oauth2/token"
 	tweetSearchUrl = "https://api.twitter.com/1.1/search/tweets.json?"
 )
@@ -73,8 +73,23 @@ func TwitterRequest(query string, token string) []byte {
 	return respBody
 }
 
+func ParseConfig(config map[string]string) string {
+	builder := strings.Builder{}
+	builder.WriteString(tweetSearchUrl)
+	builder.WriteString("q=")
+	builder.WriteString(url.QueryEscape(config["q"]))
+	for k,v := range config {
+		if k == "q" || v == "" {
+			continue
+		}
+		builder.WriteString("&")
+		builder.WriteString(fmt.Sprintf("%s=%s",k,v))
+	}
+	return builder.String()
+}
 
-func SearchTweets(queries string,token string) []string {
+
+func SearchTweets(queryUrl string,token string) []string {
 	type Tweets struct {
 		Statuses [] struct {
 			Text string `json:"full_text"`
@@ -84,13 +99,6 @@ func SearchTweets(queries string,token string) []string {
 		} `json:"statuses"`
 	}
 	var m Tweets
-	builder := strings.Builder{}
-	builder.WriteString(tweetSearchUrl)
-	builder.WriteString("q=")
-	builder.WriteString(url.QueryEscape(queries))
-	builder.WriteString(fmt.Sprintf("&count=%s",tweetLimit))
-	builder.WriteString("&tweet_mode=extended")
-	queryUrl := builder.String()
 	respbody := TwitterRequest(queryUrl,token)
 	err := json.Unmarshal(respbody, &m)
 	if err != nil {
