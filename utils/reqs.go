@@ -14,7 +14,6 @@ import (
 )
 
 var (
-	tweetLimit = "26"
 	bearerUrl = "https://api.twitter.com/oauth2/token"
 	tweetSearchUrl = "https://api.twitter.com/1.1/search/tweets.json?"
 )
@@ -52,7 +51,13 @@ func GetBearer(encodedToken string) string {
 }
 
 
-// general twitter request function
+/*
+General twitter API request function, only 
+supports "GET" for now, might add further functionality 
+if app requires new resources from APi
+In (2): Request url, auth token
+Out (1): byte slice that is the returned json
+*/
 func TwitterRequest(query string, token string) []byte {
 	req,err := http.NewRequest("GET",query,nil)
 	if err != nil {
@@ -73,6 +78,12 @@ func TwitterRequest(query string, token string) []byte {
 	return respBody
 }
 
+
+/*
+Function to parse search preferences into request url
+In (1): Configuration map (holds search preferences)
+Out (1): Url string ready for request
+*/
 func ParseConfig(config map[string]string) string {
 	builder := strings.Builder{}
 	builder.WriteString(tweetSearchUrl)
@@ -88,7 +99,11 @@ func ParseConfig(config map[string]string) string {
 	return builder.String()
 }
 
-
+/*
+Specialized function for searching tweets
+In (2): request url, bearer token for auth
+Out (1): Slice of tweet array
+*/
 func SearchTweets(queryUrl string,token string) []string {
 	type Tweets struct {
 		Statuses [] struct {
