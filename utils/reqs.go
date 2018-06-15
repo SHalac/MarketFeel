@@ -17,6 +17,13 @@ var (
 	bearerUrl = "https://api.twitter.com/oauth2/token"
 	tweetSearchUrl = "https://api.twitter.com/1.1/search/tweets.json?"
 )
+
+type Tweet struct {
+	Text string
+	Author string
+	Retweets int 
+	Favorites int
+}
 /*
 Function to get bearer token from twitter
 In: encoded token for request
@@ -98,19 +105,20 @@ func ParseConfig(config map[string]string) string {
 	}
 	return builder.String()
 }
-
 /*
 Specialized function for searching tweets
 In (2): request url, bearer token for auth
 Out (1): Slice of tweet array
 */
-func SearchTweets(queryUrl string,token string) []string {
+func SearchTweets(queryUrl string,token string) []*Tweet {
 	type Tweets struct {
 		Statuses [] struct {
 			Text string `json:"full_text"`
 			User struct {
 				Name string `json:"screen_name"`
 				} `json:"user"`
+			Favorites int `json:"favorite_count"`
+			Retweets int `json:"retweet_count"`
 		} `json:"statuses"`
 	}
 	var m Tweets
@@ -119,9 +127,15 @@ func SearchTweets(queryUrl string,token string) []string {
 	if err != nil {
 		log.Fatal("wrong")
 	}
-	var tweetSlice []string
+	var tweetSlice []*Tweet
 	for _,status := range m.Statuses {
-		tweetSlice = append(tweetSlice,status.Text)
+		tweetInfo := &Tweet{
+			Text:status.Text,
+			Author:status.User.Name,
+			Retweets:status.Retweets,
+			Favorites:status.Favorites,
+		}
+		tweetSlice = append(tweetSlice,tweetInfo)
 	}
 	return tweetSlice
 

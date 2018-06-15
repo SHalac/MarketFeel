@@ -38,14 +38,15 @@ func main() {
 	} else {
 		fmt.Println("token already in DB ")
 	}
-	var tweets []string
+	var tweets []*utils.Tweet
 	reqUrl := utils.ParseConfig(searchConfig)
 	tweets = utils.SearchTweets(reqUrl,token)
-	fmt.Println(len(tweets), " TOTAL TWEETS FOUND for ",tweetQueries)
+	fmt.Println(len(tweets), " TOTAL TWEETS FOUND for ",reqUrl)
 	for _, tweet := range tweets {
-		//fmt.Println(idx)
-		fmt.Println(tweet)
-		//fmt.Println("\n")
+		fmt.Println("Username: ",tweet.Author)
+		fmt.Println("Text: ", tweet.Text)
+		fmt.Println("Retweets: ", tweet.Retweets)
+		fmt.Println("Favorites: ", tweet.Favorites)
 	}
 }
 
