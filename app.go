@@ -43,10 +43,7 @@ func main() {
 	tweets = utils.SearchTweets(reqUrl,token)
 	fmt.Println(len(tweets), " TOTAL TWEETS FOUND for ",reqUrl)
 	for _, tweet := range tweets {
-		fmt.Println("Username: ",tweet.Author)
-		fmt.Println("Text: ", tweet.Text)
-		fmt.Println("Retweets: ", tweet.Retweets)
-		fmt.Println("Favorites: ", tweet.Favorites)
+		fmt.Println(*tweet)
 	}
 }
 

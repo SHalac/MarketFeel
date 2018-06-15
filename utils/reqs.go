@@ -24,6 +24,16 @@ type Tweet struct {
 	Retweets int 
 	Favorites int
 }
+
+func (t Tweet) String() string {
+	builder := strings.Builder{}
+	builder.WriteString(fmt.Sprintf("Username: %s \n",t.Author))
+	builder.WriteString(fmt.Sprintf("Retweets: %v \n",t.Retweets))
+	builder.WriteString(fmt.Sprintf("Favorites: %v \n",t.Favorites))
+	builder.WriteString(fmt.Sprintf("Text: %s \n",t.Text))
+	return builder.String()
+}
+
 /*
 Function to get bearer token from twitter
 In: encoded token for request
