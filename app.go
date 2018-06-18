@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"marketfeel/secrets"
 	"marketfeel/db"
-	"marketfeel/utils"
+	"marketfeel/twitterapi"
+	_ "marketfeel/azureapi"
 	"log"
 	_ "reflect"
 )
@@ -27,8 +28,8 @@ var searchConfig = map[string]string{
 func main() {
 	token, err := db.GetDbToken()
 	if err != nil {
-		encodedToken := utils.EncodeToken(consumerKey,consumerSecret)
-		bearerToken := utils.GetBearer(encodedToken)
+		encodedToken := twitterapi.EncodeToken(consumerKey,consumerSecret)
+		bearerToken := twitterapi.GetBearer(encodedToken)
 		err2 := db.AddTokenDb(bearerToken)
 		if err2 != nil {
 			log.Fatal("something went wrong")
@@ -38,13 +39,16 @@ func main() {
 	} else {
 		fmt.Println("token already in DB ")
 	}
-	var tweets []*utils.Tweet
-	reqUrl := utils.ParseConfig(searchConfig)
-	tweets = utils.SearchTweets(reqUrl,token)
+	var tweets []*twitterapi.Tweet
+	var texts []string
+	reqUrl := twitterapi.ParseParams(searchConfig)
+	tweets,texts = twitterapi.SearchTweets(reqUrl,token)
 	fmt.Println(len(tweets), " TOTAL TWEETS FOUND for ",reqUrl)
 	for _, tweet := range tweets {
 		fmt.Println(*tweet)
 	}
+	g := azureapi.ConstructBody(texts)
+	fmt.Println(g)
 }
 
 
