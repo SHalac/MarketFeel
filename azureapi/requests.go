@@ -43,9 +43,9 @@ for each document
 */
 type SentimentResp struct {
 	Documents []struct {
-		Score string `json:score`
-		Id string `json:string`
-		} `json:documents`
+		Score float64 `json:score`
+		Id string `json:id`
+	} `json:documents`
 }
 
 /*
@@ -95,24 +95,20 @@ func FetchSentiment(reqbody []byte) []byte{
 	return respBody
 }
 
-func EvalSentiment(texts []string) int {
+func EvalSentiment(texts []string) float64 {
 	bytebody := ConstructBody(texts)
 	byteresp := FetchSentiment(bytebody)
 	var azureresp SentimentResp
 	err := json.Unmarshal(byteresp, &azureresp)
 	if err != nil {
+		fmt.Println(err)
 		log.Fatal("azure response unmarshal error!")
 	}
-	var scoretotal int
+	var scoretotal float64
 	for _,doc := range azureresp.Documents {
-		score_int, err2 := strconv.Atoi(doc.Score)
-		if err2 != nil {
-			fmt.Println("doc socre conversion error in Eval Sentiment")
-		} else {
-			scoretotal += score_int
-		}
+		scoretotal += doc.Score
 	}// for loop
-	return scoretotal/len(azureresp.Documents)
+	return scoretotal/float64(len(azureresp.Documents))
 }
 
 
