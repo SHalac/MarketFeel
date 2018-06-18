@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"marketfeel/secrets"
 	"encoding/json"
+	"fmt"
 )
 
 var (
@@ -13,22 +14,26 @@ var (
 )
 
 type Document struct {
-	language string
-	id string
-	text string
+	Language string `json:language`
+	Id string `json:id`
+	Text string `json:text`
 }
 
 type Body struct {
-	documents []Document
+	Documents []Document
 }
 
 func ConstructBody(texts []string) string{
-	var reqbody = &Body{}
+	var reqbody = Body{}
 	for idx, text := range texts {
-		var doc = &Document{lang,strconv.Itoa(idx),text}
-		reqbody.documents = append(reqbody.documents,doc)
+		var doc = Document{lang,strconv.Itoa(idx),text}
+		reqbody.Documents = append(reqbody.Documents,doc)
 	}
-	return json.Marshal(reqbody).string()
+	bytebody, err := json.Marshal(reqbody)
+	if err != nil {
+		fmt.Println("body construction to json went wrong")
+	}
+	return string(bytebody)
 }
 
 

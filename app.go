@@ -5,7 +5,7 @@ import (
 	"marketfeel/secrets"
 	"marketfeel/db"
 	"marketfeel/twitterapi"
-	_ "marketfeel/azureapi"
+	"marketfeel/azureapi"
 	"log"
 	_ "reflect"
 )
@@ -39,16 +39,18 @@ func main() {
 	} else {
 		fmt.Println("token already in DB ")
 	}
-	var tweets []*twitterapi.Tweet
+	//var tweets []*twitterapi.Tweet
 	var texts []string
 	reqUrl := twitterapi.ParseParams(searchConfig)
-	tweets,texts = twitterapi.SearchTweets(reqUrl,token)
+	_,texts = twitterapi.SearchTweets(reqUrl,token)
+	/*
 	fmt.Println(len(tweets), " TOTAL TWEETS FOUND for ",reqUrl)
 	for _, tweet := range tweets {
 		fmt.Println(*tweet)
 	}
-	g := azureapi.ConstructBody(texts)
-	fmt.Println(g)
+	*/
+	_ = azureapi.ConstructBody(texts)
+	//fmt.Println(g)
 }
 
 
