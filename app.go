@@ -49,8 +49,8 @@ func main() {
 		fmt.Println(*tweet)
 	}
 	*/
-	_ = azureapi.ConstructBody(texts)
-	//fmt.Println(g)
+	score := azureapi.EvalSentiment(texts)
+	fmt.Println("Score is ",score)
 }
 
 

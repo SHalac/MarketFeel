@@ -83,8 +83,8 @@ func TwitterRequest(query string, token string) []byte {
 		log.Fatal(err.Error())
 	}
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s",token))
-	client := &http.Client{}
-	resp, err2 := client.Do(req)
+	twitterclient := &http.Client{}
+	resp, err2 := twitterclient.Do(req)
 	if err2 != nil {
 		fmt.Println(err2)
 		return nil
@@ -93,6 +93,7 @@ func TwitterRequest(query string, token string) []byte {
 	respBody, err3 := ioutil.ReadAll(resp.Body)
 	if err3 != nil {
 		fmt.Println("bad body")
+		return nil
 	}
 	return respBody
 }
@@ -133,15 +134,15 @@ func SearchTweets(queryUrl string,token string) ([]*Tweet, []string) {
 			Retweets int `json:"retweet_count"`
 		} `json:"statuses"`
 	}
-	var m Tweets
+	var responsestruct Tweets
 	respbody := TwitterRequest(queryUrl,token)
-	err := json.Unmarshal(respbody, &m)
+	err := json.Unmarshal(respbody, &responsestruct)
 	if err != nil {
-		log.Fatal("wrong")
+		log.Fatal("twitter unmarshal error!")
 	}
 	var tweetSlice []*Tweet
 	var texts []string
-	for _,status := range m.Statuses {
+	for _,status := range responsestruct.Statuses {
 		tweetInfo := &Tweet{
 			Text:status.Text,
 			Author:status.User.Name,
