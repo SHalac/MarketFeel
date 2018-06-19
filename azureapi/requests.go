@@ -70,7 +70,7 @@ func ConstructBody(texts []string) []byte{
 
 /*
 This function sends the JSON docs to azure
-for sentiment processing. Returns 
+for sentiment processing. Returns byte json
 */
 func FetchSentiment(reqbody []byte) []byte{
 	req,err := http.NewRequest("POST",endpoint,bytes.NewBuffer(reqbody))
@@ -95,6 +95,11 @@ func FetchSentiment(reqbody []byte) []byte{
 	return respBody
 }
 
+/*
+Function evaluates sentiment of a list of tweets
+In: Array of tweets
+Out: Sentiment score 0 - 1.0 (higher is good)
+*/
 func EvalSentiment(texts []string) float64 {
 	bytebody := ConstructBody(texts)
 	byteresp := FetchSentiment(bytebody)

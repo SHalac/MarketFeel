@@ -17,9 +17,9 @@ var (
 
 var searchConfig = map[string]string{
 	"lang": "en",
-	"result_type": "popular",
-	"count": "18",
-	"q": "donald trump -filter:retweets since:2018-06-01",
+	//"result_type": "popular",
+	"count": "28",
+	"q": "$SHOP -filter:retweets since:2018-06-01",
 	"tweet_mode": "extended",
 }
 
@@ -50,7 +50,8 @@ func main() {
 	}
 	*/
 	score := azureapi.EvalSentiment(texts)
-	fmt.Println("Score is ",score)
+	ui_resp := fmt.Sprintf("Score for %s is %f",searchConfig["q"],score)
+	fmt.Println(ui_resp)
 }
 
 
