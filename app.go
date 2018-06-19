@@ -7,7 +7,9 @@ import (
 	"marketfeel/twitterapi"
 	"marketfeel/azureapi"
 	"log"
-	_ "reflect"
+	"bufio"
+	"os"
+	"strings"
 )
 
 var (
@@ -19,7 +21,7 @@ var searchConfig = map[string]string{
 	"lang": "en",
 	//"result_type": "popular",
 	"count": "28",
-	"q": "$SHOP -filter:retweets since:2018-06-01",
+	"q": "-filter:retweets since:2018-06-10 ",
 	"tweet_mode": "extended",
 }
 
@@ -34,12 +36,13 @@ func main() {
 		if err2 != nil {
 			log.Fatal("something went wrong")
 		}
-		fmt.Println("added token to db")
 		token, _ = db.GetDbToken()
-	} else {
-		fmt.Println("token already in DB ")
 	}
-	//var tweets []*twitterapi.Tweet
+	fmt.Println("Enter a stock name (using $ before): ")
+	reader := bufio.NewReader(os.Stdin)
+	stockname, _ := reader.ReadString('\n')
+	stockname = strings.TrimSuffix(stockname,"\n")
+	searchConfig["q"] = searchConfig["q"] + stockname
 	var texts []string
 	reqUrl := twitterapi.ParseParams(searchConfig)
 	_,texts = twitterapi.SearchTweets(reqUrl,token)
@@ -50,7 +53,8 @@ func main() {
 	}
 	*/
 	score := azureapi.EvalSentiment(texts)
-	ui_resp := fmt.Sprintf("Score for %s is %f",searchConfig["q"],score)
+	//ui_resp := fmt.Sprintf("Score for %s is %f",searchConfig["q"],score)
+	ui_resp := fmt.Sprintf("Score for %s is %f",stockname,score)
 	fmt.Println(ui_resp)
 }
 
